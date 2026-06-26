@@ -128,11 +128,7 @@ class _LoginForm extends StatelessWidget {
         const SizedBox(height: AppSpacing.lg),
         AppPrimaryButton(
           label: 'Secure Login',
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => const NarcoLibProfileScreen(),
-            ),
-          ),
+          onPressed: () => Navigator.of(context).pushNamed(AppRoutes.profile),
         ),
       ],
     );

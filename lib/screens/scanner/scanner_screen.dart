@@ -1,8 +1,9 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_spacing.dart';
-import '../../widgets/app_primary_button.dart';
+import '../../core/routes/app_routes.dart';
 import '../../widgets/app_scaffold.dart';
 
 class ScannerScreen extends StatelessWidget {
@@ -12,12 +13,35 @@ class ScannerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppScaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () => Navigator.of(context).pop(),
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: InkWell(
+          onTap: () => Navigator.of(context).pop(),
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.arrow_back,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'BACK',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.0,
+                      ),
+                ),
+              ],
+            ),
+          ),
         ),
-        title: const Text('BACK'),
-        titleSpacing: 0,
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -25,113 +49,154 @@ class ScannerScreen extends StatelessWidget {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 390),
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.lg,
-                  AppSpacing.xs,
-                  AppSpacing.lg,
-                  AppSpacing.xl,
-                ),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight - 32),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                    vertical: AppSpacing.md,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       const SizedBox(height: AppSpacing.xs),
-                      Text(
-                        'SCANNER',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 1.2,
+                      // 1. Instruction label
+                      Center(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.surface.withOpacity(0.4),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: AppColors.primary.withOpacity(0.3),
+                              width: 1,
                             ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.info_outline_rounded,
+                                color: AppColors.primary,
+                                size: 18,
+                              ),
+                              const SizedBox(width: 10),
+                              Flexible(
+                                child: Text(
+                                  'Capture the substance',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(
+                                        color: AppColors.primary,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.3,
+                                      ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Substance Capture Preview',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.textSecondary,
-                              letterSpacing: 0.3,
-                            ),
+                      const SizedBox(height: AppSpacing.xxl),
+                      // 2. Scanner targeting/reticle design
+                      const Center(
+                        child: SizedBox(
+                          width: 280,
+                          height: 280,
+                          child: CustomPaint(
+                            painter: ScannerReticlePainter(),
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: AppSpacing.xl),
+                      const SizedBox(height: AppSpacing.xxl),
+                      // 3. START SCAN button
                       Container(
-                        padding: const EdgeInsets.all(18),
+                        height: 60,
                         decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(color: AppColors.border, width: 1),
-                          boxShadow: const [
+                          borderRadius: BorderRadius.circular(16),
+                          gradient: const LinearGradient(
+                            colors: [
+                              AppColors.primary,
+                              Color(0xFF0DADB5),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                          boxShadow: [
                             BoxShadow(
-                              color: Color(0x26000000),
-                              blurRadius: 24,
-                              offset: Offset(0, 12),
+                              color: AppColors.primary.withOpacity(0.35),
+                              blurRadius: 18,
+                              offset: const Offset(0, 6),
                             ),
                           ],
                         ),
-                        child: Column(
-                          children: [
-                            Container(
-                              height: 360,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                gradient: const LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Color(0xFF0D1721),
-                                    Color(0xFF081018),
-                                    Color(0xFF0D1721),
-                                  ],
-                                ),
-                                border: Border.all(color: AppColors.border, width: 1),
-                              ),
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  Positioned.fill(
-                                    child: CustomPaint(
-                                      painter: _ScannerBackdropPainter(),
-                                    ),
-                                  ),
-                                  const _PreviewFrame(),
-                                  Positioned(
-                                    top: 18,
-                                    child: _CaptureHint(),
-                                  ),
-                                ],
-                              ),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                            const SizedBox(height: AppSpacing.lg),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _OutlineActionButton(
-                                    label: 'UPLOAD IMAGE',
-                                    icon: Icons.upload_file_rounded,
-                                    onPressed: () {},
-                                  ),
+                          ),
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/result');
+                          },
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ScannerIcon(),
+                              SizedBox(width: 12),
+                              Text(
+                                'START SCAN',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 0.8,
                                 ),
-                                const SizedBox(width: AppSpacing.md),
-                                Expanded(
-                                  child: _OutlineActionButton(
-                                    label: 'CAPTURE IMAGE',
-                                    icon: Icons.photo_camera_rounded,
-                                    onPressed: () {},
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       const SizedBox(height: AppSpacing.xl),
-                      AppPrimaryButton(
-                        label: 'Analyze Substance',
-                        onPressed: () {},
+                      // 4. Bottom buttons
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _BottomMenuButton(
+                              label: 'GEO MAP',
+                              icon: Icons.map_outlined,
+                              onPressed: () {
+                                Navigator.pushNamed(context, AppRoutes.location);
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          Expanded(
+                            child: _BottomMenuButton(
+                              label: 'HISTORY',
+                              icon: Icons.history_rounded,
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/history');
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          Expanded(
+                            child: _BottomMenuButton(
+                              label: 'GALLERY',
+                              icon: Icons.photo_camera_outlined,
+                              onPressed: () {
+                                Navigator.pushNamed(context, AppRoutes.gallery);
+                              },
+                            ),
+                          ),
+                        ],
                       ),
+                      const SizedBox(height: AppSpacing.xs),
                     ],
                   ),
                 ),
@@ -144,124 +209,155 @@ class ScannerScreen extends StatelessWidget {
   }
 }
 
-class _CaptureHint extends StatelessWidget {
+class ScannerReticlePainter extends CustomPainter {
+  const ScannerReticlePainter();
+
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceElevated,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border, width: 1),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.info_outline_rounded, color: AppColors.primary, size: 18),
-          const SizedBox(width: 8),
-          Text(
-            'Place sample inside frame',
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w800,
-                ),
-          ),
+  void paint(Canvas canvas, Size size) {
+    final width = size.width;
+    final height = size.height;
+    final center = Offset(width / 2, height / 2);
+    final paintCyan = Paint()
+      ..color = AppColors.primary
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+
+    // 1. Concentric Circles
+    // Outer circle
+    canvas.drawCircle(center, 120, paintCyan..color = AppColors.primary.withOpacity(0.25));
+    // Middle circle
+    canvas.drawCircle(center, 90, paintCyan..color = AppColors.primary.withOpacity(0.45));
+    // Inner circle
+    canvas.drawCircle(center, 60, paintCyan..color = AppColors.primary.withOpacity(0.7));
+
+    // 2. Crosshairs
+    final paintCrosshair = Paint()
+      ..color = AppColors.primary.withOpacity(0.55)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+
+    // Horizontal line through the center
+    canvas.drawLine(Offset(center.dx - 85, center.dy), Offset(center.dx + 85, center.dy), paintCrosshair);
+    // Vertical line through the center
+    canvas.drawLine(Offset(center.dx, center.dy - 85), Offset(center.dx, center.dy + 85), paintCrosshair);
+
+    // 3. Tick Marks on the Outer Circle (R = 120)
+    final tickPaint = Paint()
+      ..color = AppColors.primary
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0;
+
+    final tickAngles = [
+      -100 * pi / 180, // top-left
+      10 * pi / 180,  // middle-right
+      100 * pi / 180, // bottom-right
+      190 * pi / 180, // middle-left
+    ];
+
+    for (final angle in tickAngles) {
+      final startX = center.dx + 114 * cos(angle);
+      final startY = center.dy + 114 * sin(angle);
+      final endX = center.dx + 126 * cos(angle);
+      final endY = center.dy + 126 * sin(angle);
+      canvas.drawLine(Offset(startX, startY), Offset(endX, endY), tickPaint);
+    }
+
+    // 4. Corner Brackets
+    final bracketPaint = Paint()
+      ..color = AppColors.primary
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.0
+      ..strokeCap = StrokeCap.round;
+
+    const double padding = 8.0;
+    const double bracketLen = 30.0;
+
+    // Top-Left
+    canvas.drawLine(const Offset(padding, padding), const Offset(padding + bracketLen, padding), bracketPaint);
+    canvas.drawLine(const Offset(padding, padding), const Offset(padding, padding + bracketLen), bracketPaint);
+
+    // Top-Right
+    canvas.drawLine(Offset(width - padding, padding), Offset(width - padding - bracketLen, padding), bracketPaint);
+    canvas.drawLine(Offset(width - padding, padding), Offset(width - padding, padding + bracketLen), bracketPaint);
+
+    // Bottom-Left
+    canvas.drawLine(Offset(padding, height - padding), Offset(padding + bracketLen, height - padding), bracketPaint);
+    canvas.drawLine(Offset(padding, height - padding), Offset(padding, height - padding - bracketLen), bracketPaint);
+
+    // Bottom-Right
+    canvas.drawLine(Offset(width - padding, height - padding), Offset(width - padding - bracketLen, height - padding), bracketPaint);
+    canvas.drawLine(Offset(width - padding, height - padding), Offset(width - padding, height - padding - bracketLen), bracketPaint);
+
+    // 5. Center Dot and Glow
+    final glowPaint = Paint()
+      ..shader = RadialGradient(
+        colors: [
+          AppColors.primary.withOpacity(0.8),
+          AppColors.primary.withOpacity(0.0),
         ],
-      ),
-    );
+      ).createShader(Rect.fromCircle(center: center, radius: 24));
+    canvas.drawCircle(center, 24, glowPaint);
+
+    final dotPaint = Paint()
+      ..color = AppColors.primary
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(center, 8, dotPaint);
   }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-class _PreviewFrame extends StatelessWidget {
-  const _PreviewFrame();
+class ScannerIcon extends StatelessWidget {
+  const ScannerIcon({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 250,
-      height: 250,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          _CircleRing(size: 250, thickness: 1.2),
-          _CircleRing(size: 188, thickness: 1.6),
-          _CircleRing(size: 142, thickness: 1.6),
-          _CrosshairLine(width: 1.2, height: 188),
-          _CrosshairLine(width: 188, height: 1.2),
-          Positioned(
-            top: 28,
-            child: Container(width: 1.2, height: 30, color: AppColors.primarySoft.withOpacity(0.9)),
-          ),
-          Positioned(
-            bottom: 28,
-            child: Container(width: 1.2, height: 30, color: AppColors.primarySoft.withOpacity(0.9)),
-          ),
-          Positioned(
-            left: 28,
-            child: Container(width: 30, height: 1.2, color: AppColors.primarySoft.withOpacity(0.9)),
-          ),
-          Positioned(
-            right: 28,
-            child: Container(width: 30, height: 1.2, color: AppColors.primarySoft.withOpacity(0.9)),
-          ),
-          Container(
-            width: 16,
-            height: 16,
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              shape: BoxShape.circle,
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x6618E7F2),
-                  blurRadius: 14,
-                  spreadRadius: 3,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+    return CustomPaint(
+      size: const Size(20, 20),
+      painter: const ScannerIconPainter(),
     );
   }
 }
 
-class _CircleRing extends StatelessWidget {
-  const _CircleRing({required this.size, required this.thickness});
-
-  final double size;
-  final double thickness;
+class ScannerIconPainter extends CustomPainter {
+  const ScannerIconPainter();
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: AppColors.primary.withOpacity(0.95), width: thickness),
-      ),
-    );
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final paint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0
+      ..strokeCap = StrokeCap.round;
+
+    const double len = 6.0;
+
+    // Top-Left
+    canvas.drawLine(const Offset(0, 0), const Offset(len, 0), paint);
+    canvas.drawLine(const Offset(0, 0), const Offset(0, len), paint);
+
+    // Top-Right
+    canvas.drawLine(Offset(w, 0), Offset(w - len, 0), paint);
+    canvas.drawLine(Offset(w, 0), Offset(w, len), paint);
+
+    // Bottom-Left
+    canvas.drawLine(Offset(0, h), Offset(len, h), paint);
+    canvas.drawLine(Offset(0, h), Offset(0, h - len), paint);
+
+    // Bottom-Right
+    canvas.drawLine(Offset(w, h), Offset(w - len, h), paint);
+    canvas.drawLine(Offset(w, h), Offset(w, h - len), paint);
   }
-}
-
-class _CrosshairLine extends StatelessWidget {
-  const _CrosshairLine({required this.width, required this.height});
-
-  final double width;
-  final double height;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      color: AppColors.primarySoft.withOpacity(0.45),
-    );
-  }
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-class _OutlineActionButton extends StatelessWidget {
-  const _OutlineActionButton({
+class _BottomMenuButton extends StatelessWidget {
+  const _BottomMenuButton({
     required this.label,
     required this.icon,
     required this.onPressed,
@@ -273,62 +369,45 @@ class _OutlineActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 58,
-      child: OutlinedButton.icon(
-        onPressed: onPressed,
-        icon: Icon(icon, size: 20),
-        label: Text(label),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          side: const BorderSide(color: AppColors.border, width: 1.2),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          textStyle: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0.4,
+    return Container(
+      height: 84,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: AppColors.border.withOpacity(0.4),
+          width: 1.2,
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(14),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  color: AppColors.textSecondary,
+                  size: 24,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.4,
+                      ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
-}
-
-class _ScannerBackdropPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final gridPaint = Paint()
-      ..color = AppColors.primary.withOpacity(0.07)
-      ..strokeWidth = 1;
-
-    for (var i = 1; i <= 3; i++) {
-      final x = size.width * i / 4;
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), gridPaint);
-    }
-
-    for (var i = 1; i <= 2; i++) {
-      final y = size.height * i / 3;
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
-    }
-
-    final glowPaint = Paint()
-      ..shader = const LinearGradient(
-        colors: [
-          Color(0x0018E7F2),
-          Color(0x3D18E7F2),
-          Color(0x0018E7F2),
-        ],
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
-
-    canvas.drawRect(Rect.fromLTWH(size.width * 0.22, 0, size.width * 0.018, size.height), glowPaint);
-    canvas.drawRect(Rect.fromLTWH(size.width * 0.64, 0, size.width * 0.02, size.height), glowPaint);
-    canvas.drawRect(Rect.fromLTWH(0, size.height * 0.34, size.width, size.height * 0.014), glowPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

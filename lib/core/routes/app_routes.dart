@@ -8,7 +8,7 @@ import '../../screens/help/help_screen.dart';
 import '../../screens/history/history_screen.dart';
 import '../../screens/location/location_screen.dart';
 import '../../screens/profile/profile_screen.dart';
-import '../../screens/result/result_screen.dart';
+import '../../screens/scanner/result_screen.dart';
 import '../../screens/report/report_screen.dart';
 import '../../screens/scanner/scanner_screen.dart';
 
@@ -55,7 +55,7 @@ class AppRoutes {
       case result:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const NarcoLibResultScreen(),
+          builder: (_) => const ResultScreen(),
         );
       case location:
         return MaterialPageRoute<void>(
@@ -65,7 +65,7 @@ class AppRoutes {
       case history:
         return MaterialPageRoute<void>(
           settings: settings,
-          builder: (_) => const NarcoLibHistoryScreen(),
+          builder: (_) => const HistoryScreen(),
         );
       case report:
         return MaterialPageRoute<void>(

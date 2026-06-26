@@ -5,6 +5,8 @@ import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/profile/profile_screen.dart';
 import 'screens/scanner/scanner_screen.dart';
+import 'screens/scanner/result_screen.dart';
+import 'screens/history/history_screen.dart';
 
 void main() {
   runApp(const NarcoLibApp());
@@ -25,7 +27,9 @@ class NarcoLibApp extends StatelessWidget {
         '/auth/login': (context) => const NarcoLibLoginScreen(),
         '/auth/register': (context) => const NarcoLibRegisterScreen(),
         '/profile': (context) => const NarcoLibProfileScreen(),
-        '/scanner': (context) => const ScannerScreen(),
+        '/scanner': (context) => ScannerScreen(),
+        '/result': (context) => ResultScreen(),
+        '/history': (context) => HistoryScreen(),
       },
     );
   }

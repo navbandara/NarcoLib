@@ -160,9 +160,9 @@ class _MapSurface extends StatelessWidget {
                       center: const Alignment(0.15, -0.1),
                       radius: 1.0,
                       colors: [
-                        AppColors.primary.withOpacity(0.12),
-                        AppColors.backgroundMuted.withOpacity(0.0),
-                        AppColors.background.withOpacity(0.25),
+                        AppColors.primary.withValues(alpha: 0.12),
+                        AppColors.backgroundMuted.withValues(alpha: 0.0),
+                        AppColors.background.withValues(alpha: 0.25),
                       ],
                       stops: const [0.0, 0.6, 1.0],
                     ),
@@ -207,7 +207,7 @@ class _MapGridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final gridPaint = Paint()
-      ..color = AppColors.primary.withOpacity(0.08)
+      ..color = AppColors.primary.withValues(alpha: 0.08)
       ..strokeWidth = 1;
 
     const verticalCount = 3;
@@ -224,7 +224,7 @@ class _MapGridPainter extends CustomPainter {
     }
 
     final roadPaint = Paint()
-      ..color = AppColors.primarySoft.withOpacity(0.10)
+      ..color = AppColors.primarySoft.withValues(alpha: 0.10)
       ..strokeWidth = 12
       ..strokeCap = StrokeCap.round;
 
@@ -288,7 +288,7 @@ class _DotMarker extends StatelessWidget {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.35),
+            color: color.withValues(alpha: 0.35),
             blurRadius: 10,
             spreadRadius: 3,
           ),
@@ -309,7 +309,7 @@ class _MapMarkerPulse extends StatelessWidget {
           width: 142,
           height: 142,
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.08),
+            color: AppColors.primary.withValues(alpha: 0.08),
             shape: BoxShape.circle,
           ),
           child: Center(
@@ -317,7 +317,7 @@ class _MapMarkerPulse extends StatelessWidget {
               width: 76,
               height: 76,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.16),
+                color: AppColors.primary.withValues(alpha: 0.16),
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.primary, width: 1.4),
               ),

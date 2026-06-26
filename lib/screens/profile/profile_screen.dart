@@ -101,7 +101,7 @@ class NarcoLibProfileScreen extends StatelessWidget {
                       _QuickAccessButton(
                         label: 'History',
                         icon: Icons.history_rounded,
-                        onTap: () => Navigator.of(context).pushNamed(AppRoutes.history),
+                        onTap: () => Navigator.of(context).pushNamed('/history'),
                       ),
                       _QuickAccessButton(
                         label: 'Geo Map',

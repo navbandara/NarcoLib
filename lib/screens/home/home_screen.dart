@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_spacing.dart';
+import '../../core/routes/app_routes.dart';
 import '../../widgets/app_panel.dart';
 import '../../widgets/app_primary_button.dart';
 import '../../widgets/app_scaffold.dart';
@@ -87,7 +88,7 @@ class NarcoLibHomeScreen extends StatelessWidget {
           const SizedBox(height: AppSpacing.xl),
           AppPrimaryButton(
             label: 'OFFICER LOGIN',
-            onPressed: () => Navigator.of(context).pushNamed('/auth/login'),
+            onPressed: () => Navigator.of(context).pushNamed(AppRoutes.login),
           ),
           const SizedBox(height: AppSpacing.md),
           OutlinedButton(
@@ -104,7 +105,7 @@ class NarcoLibHomeScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(18),
               ),
             ),
-            onPressed: () => Navigator.of(context).pushNamed('/auth/register'),
+            onPressed: () => Navigator.of(context).pushNamed(AppRoutes.register),
             child: const Text('REGISTER'),
           ),
           const SizedBox(height: AppSpacing.xl),

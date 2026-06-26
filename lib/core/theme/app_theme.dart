@@ -12,7 +12,6 @@ class AppTheme {
       secondary: AppColors.primarySoft,
       error: AppColors.warning,
     ).copyWith(
-      background: AppColors.background,
       surface: AppColors.surface,
       onSurface: AppColors.textPrimary,
       onPrimary: AppColors.background,

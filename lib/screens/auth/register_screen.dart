@@ -9,7 +9,6 @@ import '../../widgets/app_scaffold.dart';
 import '../../widgets/app_section_header.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/app_warning_banner.dart';
-import '../profile/profile_screen.dart';
 
 class NarcoLibRegisterScreen extends StatelessWidget {
   const NarcoLibRegisterScreen({super.key});
@@ -156,11 +155,7 @@ class _RegisterForm extends StatelessWidget {
         const SizedBox(height: AppSpacing.xl),
         AppPrimaryButton(
           label: 'Complete Registration',
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => const NarcoLibProfileScreen(),
-            ),
-          ),
+          onPressed: () => Navigator.of(context).pushNamed(AppRoutes.profile),
         ),
       ],
     );
