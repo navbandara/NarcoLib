@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:narcolib_app/app.dart';
+import 'package:narcolib_app/screens/report/pdf_report_screen.dart';
 
 void main() {
   testWidgets('NarcoLib home screen renders', (WidgetTester tester) async {
@@ -136,6 +137,11 @@ void main() {
 
     expect(find.text('SAVE TO HISTORY'), findsOneWidget);
     expect(find.text('NEW SCAN'), findsOneWidget);
+
+    // 4. Tap GENERATE PDF REPORT and verify navigation to PdfReportScreen
+    await tester.tap(pdfReportFinder);
+    await tester.pumpAndSettle();
+    expect(find.text('Official PDF Documentation'), findsOneWidget);
   });
 
   testWidgets('profile navigates to history screen and delete/undo/view-report actions work', (WidgetTester tester) async {
@@ -216,6 +222,208 @@ void main() {
     // Verify we navigated to the Result Screen
     expect(find.text('ANALYSIS COMPLETE'), findsOneWidget);
     expect(find.text('Heroin Detected'), findsOneWidget);
+  });
+
+  testWidgets('gallery screen renders correctly and displays evidence cards', (WidgetTester tester) async {
+    await tester.pumpWidget(const NarcoLibApp());
+
+    // 1. Navigate to Profile Screen
+    await tester.tap(find.text('OFFICER LOGIN'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Secure Login'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Secure Login'));
+    await tester.pumpAndSettle();
+
+    // Scroll to quick access grid
+    final listFinder = find.byType(ListView);
+    await tester.drag(listFinder, const Offset(0, -400));
+    await tester.pumpAndSettle();
+
+    // 2. Tap Gallery button to navigate to Gallery screen
+    final galleryBtnFinder = find.text('Gallery');
+    await tester.ensureVisible(galleryBtnFinder);
+    await tester.pumpAndSettle();
+    await tester.tap(galleryBtnFinder);
+    await tester.pumpAndSettle();
+
+    // 3. Verify title and records rendered on the Gallery Screen
+    expect(find.text('EVIDENCE GALLERY'), findsOneWidget);
+    expect(find.text('Heroin'), findsOneWidget);
+    expect(find.text('SMP-20491'), findsOneWidget);
+    expect(find.text('94.7%'), findsOneWidget);
+    expect(find.text('2026-06-27'), findsWidgets);
+
+    // 4. Tap Upload Evidence and check SnackBar
+    final uploadBtnFinder = find.text('UPLOAD EVIDENCE');
+    final galleryListFinder = find.byType(ListView);
+    await tester.dragUntilVisible(
+      uploadBtnFinder,
+      galleryListFinder,
+      const Offset(0, -100),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(uploadBtnFinder);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Upload Evidence flow simulated successfully.'), findsOneWidget);
+  });
+
+  testWidgets('location screen renders correctly and SOS dialog works', (WidgetTester tester) async {
+    await tester.pumpWidget(const NarcoLibApp());
+
+    // 1. Navigate to Profile Screen
+    await tester.tap(find.text('OFFICER LOGIN'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Secure Login'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Secure Login'));
+    await tester.pumpAndSettle();
+
+    // Scroll to quick access grid
+    final listFinder = find.byType(ListView);
+    await tester.drag(listFinder, const Offset(0, -400));
+    await tester.pumpAndSettle();
+
+    // 2. Tap Geo Map button to navigate to Location screen
+    final geoMapBtnFinder = find.text('Geo Map');
+    await tester.ensureVisible(geoMapBtnFinder);
+    await tester.pumpAndSettle();
+    await tester.tap(geoMapBtnFinder);
+    await tester.pumpAndSettle();
+
+    // 3. Verify elements on the Location Screen
+    expect(find.text('GEOSPATIAL INTEL'), findsOneWidget);
+    expect(find.text('GPS LOCK: ACTIVE'), findsOneWidget);
+    expect(find.text('6.9271° N'), findsOneWidget);
+    expect(find.text('79.8612° E'), findsOneWidget);
+
+    // 4. Scroll down to build and reveal the SOS button and recent incidents
+    final locationListFinder = find.byType(ListView);
+    final sosBtnFinder = find.text('TRIGGER EMERGENCY SOS');
+    await tester.dragUntilVisible(
+      sosBtnFinder,
+      locationListFinder,
+      const Offset(0, -120),
+    );
+    await tester.pumpAndSettle();
+
+    // Verify scrolled items are now visible
+    expect(find.text('Recent Incident Intel'), findsOneWidget);
+    expect(find.text('Heroin Scan'), findsOneWidget);
+
+    // 5. Tap SOS and verify dialog
+    await tester.tap(sosBtnFinder);
+    await tester.pumpAndSettle();
+
+    expect(find.text('EMERGENCY SOS'), findsOneWidget);
+    expect(find.text('CONFIRM SOS'), findsOneWidget);
+
+    // 6. Confirm SOS alert and verify SnackBar
+    await tester.tap(find.text('CONFIRM SOS'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('SOS Broadcast Sent. Dispatch notified.'), findsOneWidget);
+  });
+
+  testWidgets('PdfReportScreen renders correctly and interactive dialogs show', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: PdfReportScreen(),
+      ),
+    );
+
+    // Verify title and headers render
+    expect(find.text('FORENSIC REPORT'), findsOneWidget);
+    expect(find.text('Official PDF Documentation'), findsOneWidget);
+    expect(find.text('NARCOTICS CONTROL BOARD'), findsOneWidget);
+    
+    // Verify static details render
+    expect(find.text('REP-2026-98124'), findsOneWidget);
+    expect(find.text('Officer ABC Perera'), findsOneWidget);
+    expect(find.text('Heroin (Diacetylmorphine)'), findsOneWidget);
+    expect(find.text('94.7%'), findsOneWidget);
+    expect(find.text('HIGH RISK'), findsOneWidget);
+
+    // Scroll down to build and reveal buttons
+    final downloadBtnFinder = find.text('DOWNLOAD PDF');
+    await tester.dragUntilVisible(
+      downloadBtnFinder,
+      find.byType(ListView),
+      const Offset(0, -100),
+    );
+    await tester.pumpAndSettle();
+
+    // Verify buttons render
+    expect(downloadBtnFinder, findsOneWidget);
+    expect(find.text('SHARE REPORT'), findsOneWidget);
+    expect(find.text('Back to Profile'), findsOneWidget);
+
+    // Tap DOWNLOAD PDF and check SnackBar
+    await tester.tap(downloadBtnFinder);
+    await tester.pumpAndSettle();
+    expect(find.text('Downloading report PDF... (Simulation)'), findsOneWidget);
+
+    // Tap SHARE REPORT and check SnackBar
+    await tester.tap(find.text('SHARE REPORT'));
+    await tester.pumpAndSettle();
+    expect(find.text('Sharing forensic report... (Simulation)'), findsOneWidget);
+  });
+
+  testWidgets('help screen renders correctly and displays guide topics', (WidgetTester tester) async {
+    await tester.pumpWidget(const NarcoLibApp());
+
+    // 1. Navigate to Profile Screen
+    await tester.tap(find.text('OFFICER LOGIN'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Secure Login'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Secure Login'));
+    await tester.pumpAndSettle();
+
+    // Scroll to quick access grid
+    final listFinder = find.byType(ListView);
+    await tester.drag(listFinder, const Offset(0, -400));
+    await tester.pumpAndSettle();
+
+    // 2. Tap Help button to navigate to Help screen
+    final helpBtnFinder = find.text('Help');
+    await tester.ensureVisible(helpBtnFinder);
+    await tester.pumpAndSettle();
+    await tester.tap(helpBtnFinder);
+    await tester.pumpAndSettle();
+
+    // 3. Verify elements on the Help Screen
+    expect(find.text('USER MANUAL'), findsOneWidget);
+    expect(find.text('How to scan a substance'), findsOneWidget);
+
+    final helpListFinder = find.byType(ListView);
+
+    final topic2Finder = find.text('How to read AI confidence');
+    await tester.dragUntilVisible(topic2Finder, helpListFinder, const Offset(0, -80));
+    await tester.pumpAndSettle();
+    expect(topic2Finder, findsOneWidget);
+
+    final topic3Finder = find.text('How to generate a report');
+    await tester.dragUntilVisible(topic3Finder, helpListFinder, const Offset(0, -80));
+    await tester.pumpAndSettle();
+    expect(topic3Finder, findsOneWidget);
+
+    final topic4Finder = find.text('How to use location support');
+    await tester.dragUntilVisible(topic4Finder, helpListFinder, const Offset(0, -80));
+    await tester.pumpAndSettle();
+    expect(topic4Finder, findsOneWidget);
+
+    final topic5Finder = find.text('Safety and legal disclaimer');
+    await tester.dragUntilVisible(topic5Finder, helpListFinder, const Offset(0, -80));
+    await tester.pumpAndSettle();
+    expect(topic5Finder, findsOneWidget);
+
+    // Expand "Safety and legal disclaimer" to check content
+    await tester.tap(topic5Finder);
+    await tester.pumpAndSettle();
+
+    expect(find.text('This software is designated for authorized law enforcement personnel only.'), findsOneWidget);
   });
 }
 

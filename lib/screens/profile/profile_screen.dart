@@ -106,12 +106,12 @@ class NarcoLibProfileScreen extends StatelessWidget {
                       _QuickAccessButton(
                         label: 'Geo Map',
                         icon: Icons.public_rounded,
-                        onTap: () => Navigator.of(context).pushNamed(AppRoutes.location),
+                        onTap: () => Navigator.of(context).pushNamed('/location'),
                       ),
                       _QuickAccessButton(
                         label: 'Gallery',
                         icon: Icons.photo_camera_rounded,
-                        onTap: () => Navigator.of(context).pushNamed(AppRoutes.gallery),
+                        onTap: () => Navigator.of(context).pushNamed('/gallery'),
                       ),
                     ],
                   ),
@@ -120,7 +120,7 @@ class NarcoLibProfileScreen extends StatelessWidget {
                     label: 'Help',
                     icon: Icons.menu_book_rounded,
                     fullWidth: true,
-                    onTap: () => Navigator.of(context).pushNamed(AppRoutes.help),
+                    onTap: () => Navigator.of(context).pushNamed('/help'),
                   ),
                   const SizedBox(height: AppSpacing.xl),
                   AppPrimaryButton(

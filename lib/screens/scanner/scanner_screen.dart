@@ -170,7 +170,7 @@ class ScannerScreen extends StatelessWidget {
                               label: 'GEO MAP',
                               icon: Icons.map_outlined,
                               onPressed: () {
-                                Navigator.pushNamed(context, AppRoutes.location);
+                                Navigator.pushNamed(context, '/location');
                               },
                             ),
                           ),
@@ -190,7 +190,7 @@ class ScannerScreen extends StatelessWidget {
                               label: 'GALLERY',
                               icon: Icons.photo_camera_outlined,
                               onPressed: () {
-                                Navigator.pushNamed(context, AppRoutes.gallery);
+                                Navigator.pushNamed(context, '/gallery');
                               },
                             ),
                           ),

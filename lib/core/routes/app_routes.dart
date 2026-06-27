@@ -10,6 +10,7 @@ import '../../screens/location/location_screen.dart';
 import '../../screens/profile/profile_screen.dart';
 import '../../screens/scanner/result_screen.dart';
 import '../../screens/report/report_screen.dart';
+import '../../screens/report/pdf_report_screen.dart';
 import '../../screens/scanner/scanner_screen.dart';
 
 class AppRoutes {
@@ -22,6 +23,7 @@ class AppRoutes {
   static const String location = '/location';
   static const String history = '/history';
   static const String report = '/report';
+  static const String pdfReport = '/pdf-report';
   static const String help = '/help';
   static const String gallery = '/gallery';
 
@@ -71,6 +73,11 @@ class AppRoutes {
         return MaterialPageRoute<void>(
           settings: settings,
           builder: (_) => const NarcoLibReportScreen(),
+        );
+      case pdfReport:
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => const PdfReportScreen(),
         );
       case help:
         return MaterialPageRoute<void>(

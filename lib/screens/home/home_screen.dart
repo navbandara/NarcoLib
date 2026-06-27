@@ -8,6 +8,7 @@ import '../../widgets/app_primary_button.dart';
 import '../../widgets/app_scaffold.dart';
 import '../../widgets/app_section_header.dart';
 import '../../widgets/app_warning_banner.dart';
+import '../../widgets/narcolib_logo.dart';
 
 class NarcoLibHomeScreen extends StatelessWidget {
   const NarcoLibHomeScreen({super.key});
@@ -27,31 +28,9 @@ class NarcoLibHomeScreen extends StatelessWidget {
           Center(
             child: Column(
               children: [
-                Container(
-                  width: 92,
-                  height: 92,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: const RadialGradient(
-                      colors: [
-                        Color(0x3318E7F2),
-                        Color(0x0018E7F2),
-                      ],
-                    ),
-                    border: Border.all(color: AppColors.primary, width: 2),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x3318E7F2),
-                        blurRadius: 18,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.manage_search_rounded,
-                    size: 42,
-                    color: AppColors.primary,
-                  ),
+                const NarcoLibLogo(
+                  size: 92,
+                  showGlow: true,
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Text(

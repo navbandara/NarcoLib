@@ -442,11 +442,7 @@ class ResultScreen extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('PDF report generation triggered.'),
-                          ),
-                        );
+                        Navigator.pushNamed(context, '/pdf-report');
                       },
                       icon: const Icon(
                         Icons.description_outlined,

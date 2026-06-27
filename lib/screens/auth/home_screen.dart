@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/routes/app_routes.dart';
+import '../../widgets/narcolib_logo.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -111,28 +112,9 @@ class _LogoArea extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
-          width: 96,
-          height: 96,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: const RadialGradient(
-              colors: [Color(0x3318E7F2), Color(0x0018E7F2)],
-            ),
-            border: Border.all(color: HomeScreen._cyan, width: 2),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x3318E7F2),
-                blurRadius: 20,
-                spreadRadius: 2,
-              ),
-            ],
-          ),
-          child: const Icon(
-            Icons.manage_search_rounded,
-            size: 44,
-            color: HomeScreen._cyan,
-          ),
+        const NarcoLibLogo(
+          size: 96,
+          showGlow: true,
         ),
         const SizedBox(height: 12),
         Text(

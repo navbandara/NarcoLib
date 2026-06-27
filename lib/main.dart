@@ -7,6 +7,10 @@ import 'screens/profile/profile_screen.dart';
 import 'screens/scanner/scanner_screen.dart';
 import 'screens/scanner/result_screen.dart';
 import 'screens/history/history_screen.dart';
+import 'screens/gallery/gallery_screen.dart';
+import 'screens/location/location_screen.dart';
+import 'screens/report/pdf_report_screen.dart';
+import 'screens/help/help_screen.dart';
 
 void main() {
   runApp(const NarcoLibApp());
@@ -30,6 +34,10 @@ class NarcoLibApp extends StatelessWidget {
         '/scanner': (context) => ScannerScreen(),
         '/result': (context) => ResultScreen(),
         '/history': (context) => HistoryScreen(),
+        '/gallery': (context) => const NarcoLibGalleryScreen(),
+        '/location': (context) => const NarcoLibLocationScreen(),
+        '/pdf-report': (context) => const PdfReportScreen(),
+        '/help': (context) => const NarcoLibHelpScreen(),
       },
     );
   }

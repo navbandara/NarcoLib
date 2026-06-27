@@ -9,6 +9,7 @@ import '../../widgets/app_scaffold.dart';
 import '../../widgets/app_section_header.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/app_warning_banner.dart';
+import '../../widgets/narcolib_logo.dart';
 
 class NarcoLibRegisterScreen extends StatelessWidget {
   const NarcoLibRegisterScreen({super.key});
@@ -41,24 +42,9 @@ class NarcoLibRegisterScreen extends StatelessWidget {
                   Center(
                     child: Column(
                       children: [
-                        Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: const RadialGradient(
-                              colors: [
-                                Color(0x3318E7F2),
-                                Color(0x0018E7F2),
-                              ],
-                            ),
-                            border: Border.all(color: AppColors.primary, width: 2),
-                          ),
-                          child: const Icon(
-                            Icons.manage_search_rounded,
-                            size: 46,
-                            color: AppColors.primary,
-                          ),
+                        const NarcoLibLogo(
+                          size: 100,
+                          showGlow: false,
                         ),
                         const SizedBox(height: AppSpacing.md),
                         Text(
