@@ -5,6 +5,9 @@ import '../../core/constants/app_spacing.dart';
 import '../../widgets/app_primary_button.dart';
 import '../../widgets/app_scaffold.dart';
 import '../../widgets/app_section_header.dart';
+import '../../widgets/section_title.dart';
+import '../../widgets/info_card.dart';
+import '../../widgets/status_badge.dart';
 
 class NarcoLibLocationScreen extends StatelessWidget {
   const NarcoLibLocationScreen({super.key});
@@ -58,15 +61,15 @@ class NarcoLibLocationScreen extends StatelessWidget {
                 children: [
                   const AppSectionHeader(
                     title: 'GEOSPATIAL INTEL',
-                    subtitle: 'Forensic Intelligence Map',
+                    subtitle: 'Tactical Coordinate Overlay',
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   
-                  // 1. Interactive Map Surface
+                  // 1. Radar map custom paint container
                   const _MapSurface(),
                   const SizedBox(height: AppSpacing.lg),
                   
-                  // 2. Current Location Card with Lat/Long values
+                  // 2. Coordinates details card
                   const _CurrentLocationCard(
                     locationName: 'Colombo District Headquarters',
                     latitude: '6.9271° N',
@@ -76,14 +79,7 @@ class NarcoLibLocationScreen extends StatelessWidget {
                   const SizedBox(height: AppSpacing.xl),
                   
                   // 3. Recent Scan Location Markers/List
-                  Text(
-                    'Recent Incident Intel',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.4,
-                        ),
-                  ),
+                  const SectionTitle(title: 'Recent Incident Intel'),
                   const SizedBox(height: AppSpacing.md),
                   const _RecentIncidentsList(),
                   const SizedBox(height: AppSpacing.xl),
@@ -345,13 +341,8 @@ class _CurrentLocationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return InfoCard(
       padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.border, width: 1.2),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -375,21 +366,10 @@ class _CurrentLocationCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.primary.withOpacity(0.3), width: 1),
-                ),
-                child: Text(
-                  'Acc: ±$accuracy',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.primary,
-                        fontSize: 9,
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
+              StatusBadge(
+                label: 'Acc: ±$accuracy',
+                color: AppColors.primary,
+                fontSize: 9,
               ),
             ],
           ),

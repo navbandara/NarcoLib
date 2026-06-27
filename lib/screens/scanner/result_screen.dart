@@ -6,6 +6,7 @@ import '../../core/constants/app_spacing.dart';
 import '../../widgets/app_panel.dart';
 import '../../widgets/app_scaffold.dart';
 import '../../widgets/app_section_header.dart';
+import '../../widgets/secondary_button.dart';
 
 class ResultScreen extends StatelessWidget {
   const ResultScreen({super.key});
@@ -464,7 +465,7 @@ class ResultScreen extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: _SecondaryButton(
+                        child: SecondaryButton(
                           label: 'SAVE TO HISTORY',
                           icon: Icons.bookmark_add_outlined,
                           onPressed: () {
@@ -478,7 +479,7 @@ class ResultScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
-                        child: _SecondaryButton(
+                        child: SecondaryButton(
                           label: 'NEW SCAN',
                           icon: Icons.refresh_rounded,
                           onPressed: () {
@@ -664,38 +665,4 @@ class _ActionItemRow extends StatelessWidget {
   }
 }
 
-class _SecondaryButton extends StatelessWidget {
-  const _SecondaryButton({
-    required this.label,
-    required this.icon,
-    required this.onPressed,
-  });
 
-  final String label;
-  final IconData icon;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 60,
-      child: OutlinedButton.icon(
-        onPressed: onPressed,
-        icon: Icon(icon, size: 18),
-        label: Text(label),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          side: const BorderSide(color: AppColors.border, width: 1.1),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          textStyle: const TextStyle(
-            fontWeight: FontWeight.w900,
-            fontSize: 12,
-            letterSpacing: 0.4,
-          ),
-        ),
-      ),
-    );
-  }
-}

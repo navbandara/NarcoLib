@@ -7,6 +7,8 @@ import '../../widgets/app_panel.dart';
 import '../../widgets/app_primary_button.dart';
 import '../../widgets/app_scaffold.dart';
 import '../../widgets/app_section_header.dart';
+import '../../widgets/officer_card.dart';
+import '../../widgets/section_title.dart';
 
 class NarcoLibProfileScreen extends StatelessWidget {
   const NarcoLibProfileScreen({super.key});
@@ -35,54 +37,15 @@ class NarcoLibProfileScreen extends StatelessWidget {
                     subtitle: 'Account Information',
                   ),
                   const SizedBox(height: AppSpacing.lg),
-                  AppPanel(
-                    title: 'Officer ABC Perera',
-                    subtitle: 'Active Duty',
-                    trailing: Container(
-                      width: 72,
-                      height: 72,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.surfaceElevated,
-                        border: Border.all(color: AppColors.primarySoft, width: 1),
-                      ),
-                      child: const Icon(
-                        Icons.person_outline_rounded,
-                        color: AppColors.primary,
-                        size: 34,
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        _ProfileInfoTile(
-                          label: 'Email',
-                          value: 'n12345@slpolice.gov',
-                          icon: Icons.mail_outline_rounded,
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        _ProfileInfoTile(
-                          label: 'Agency',
-                          value: 'Sri Lanka Police',
-                          icon: Icons.apartment_rounded,
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        _ProfileInfoTile(
-                          label: 'Badge Number',
-                          value: 'N12345',
-                          icon: Icons.badge_outlined,
-                        ),
-                      ],
-                    ),
+                  const OfficerCard(
+                    name: 'Officer ABC Perera',
+                    status: 'Active Duty',
+                    email: 'n12345@slpolice.gov',
+                    agency: 'Sri Lanka Police',
+                    badgeNumber: 'N12345',
                   ),
                   const SizedBox(height: AppSpacing.xl),
-                  Text(
-                    'Quick Access',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.4,
-                        ),
-                  ),
+                  const SectionTitle(title: 'Quick Access'),
                   const SizedBox(height: AppSpacing.md),
                   GridView.count(
                     crossAxisCount: 2,

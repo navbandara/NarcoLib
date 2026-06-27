@@ -5,6 +5,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_spacing.dart';
 import '../../core/routes/app_routes.dart';
 import '../../widgets/app_scaffold.dart';
+import '../../widgets/bottom_navigation_card.dart';
 
 class ScannerScreen extends StatelessWidget {
   const ScannerScreen({super.key});
@@ -166,7 +167,7 @@ class ScannerScreen extends StatelessWidget {
                       Row(
                         children: [
                           Expanded(
-                            child: _BottomMenuButton(
+                            child: BottomNavigationCard(
                               label: 'GEO MAP',
                               icon: Icons.map_outlined,
                               onPressed: () {
@@ -176,7 +177,7 @@ class ScannerScreen extends StatelessWidget {
                           ),
                           const SizedBox(width: AppSpacing.sm),
                           Expanded(
-                            child: _BottomMenuButton(
+                            child: BottomNavigationCard(
                               label: 'HISTORY',
                               icon: Icons.history_rounded,
                               onPressed: () {
@@ -186,7 +187,7 @@ class ScannerScreen extends StatelessWidget {
                           ),
                           const SizedBox(width: AppSpacing.sm),
                           Expanded(
-                            child: _BottomMenuButton(
+                            child: BottomNavigationCard(
                               label: 'GALLERY',
                               icon: Icons.photo_camera_outlined,
                               onPressed: () {
@@ -356,58 +357,4 @@ class ScannerIconPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-class _BottomMenuButton extends StatelessWidget {
-  const _BottomMenuButton({
-    required this.label,
-    required this.icon,
-    required this.onPressed,
-  });
 
-  final String label;
-  final IconData icon;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 84,
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: AppColors.border.withOpacity(0.4),
-          width: 1.2,
-        ),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(14),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  icon,
-                  color: AppColors.textSecondary,
-                  size: 24,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  label,
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: AppColors.textSecondary,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0.4,
-                      ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
