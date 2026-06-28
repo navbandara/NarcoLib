@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 
@@ -6,9 +7,68 @@ import '../../core/constants/app_spacing.dart';
 import '../../core/routes/app_routes.dart';
 import '../../widgets/app_scaffold.dart';
 import '../../widgets/bottom_navigation_card.dart';
+import '../../widgets/secondary_button.dart';
+import '../../services/image_picker_service.dart';
 
-class ScannerScreen extends StatelessWidget {
+class ScannerScreen extends StatefulWidget {
   const ScannerScreen({super.key});
+
+  /// Static bypass flag for testing navigation transitions.
+  static bool bypassValidation = false;
+
+  @override
+  State<ScannerScreen> createState() => _ScannerScreenState();
+}
+
+class _ScannerScreenState extends State<ScannerScreen> {
+  final ImagePickerService _pickerService = ImagePickerService();
+  String? _imagePath;
+  String? _placeholderMessage;
+
+  Future<void> _onCapturePressed() async {
+    final path = await _pickerService.captureImage();
+    if (path != null) {
+      setState(() {
+        _imagePath = path;
+        _placeholderMessage = null;
+      });
+    } else {
+      if (_imagePath == null) {
+        setState(() {
+          _placeholderMessage = 'Selection cancelled.';
+        });
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Image selection cancelled.')),
+      );
+    }
+  }
+
+  Future<void> _onUploadPressed() async {
+    final path = await _pickerService.selectFromGallery();
+    if (path != null) {
+      setState(() {
+        _imagePath = path;
+        _placeholderMessage = null;
+      });
+    } else {
+      if (_imagePath == null) {
+        setState(() {
+          _placeholderMessage = 'Selection cancelled.';
+        });
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Image selection cancelled.')),
+      );
+    }
+  }
+
+  void _onRemovePressed() {
+    setState(() {
+      _imagePath = null;
+      _placeholderMessage = 'Image removed.';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,17 +162,114 @@ class ScannerScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: AppSpacing.xxl),
                       // 2. Scanner targeting/reticle design
-                      const Center(
-                        child: SizedBox(
+                      Center(
+                        child: Container(
                           width: 280,
                           height: 280,
-                          child: CustomPaint(
-                            painter: ScannerReticlePainter(),
+                          decoration: BoxDecoration(
+                            color: AppColors.surface.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: AppColors.border.withOpacity(0.4),
+                              width: 1.2,
+                            ),
+                          ),
+                          child: Stack(
+                            children: [
+                              // Selected image preview or placeholder text
+                              Positioned.fill(
+                                child: _imagePath != null
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(16),
+                                        child: Image.file(
+                                          File(_imagePath!),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      )
+                                    : Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(AppSpacing.md),
+                                          child: Text(
+                                            _placeholderMessage ?? 'Ready to scan.\nUse the controls below to select an image.',
+                                            textAlign: TextAlign.center,
+                                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                                  color: AppColors.textSecondary,
+                                                ),
+                                          ),
+                                        ),
+                                      ),
+                              ),
+                              // Reticle overlay paint
+                              const Positioned.fill(
+                                child: CustomPaint(
+                                  painter: ScannerReticlePainter(),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.xxl),
-                      // 3. START SCAN button
+                      const SizedBox(height: AppSpacing.lg),
+                      // 3. Image Actions controls
+                      if (_imagePath == null) ...[
+                        Row(
+                          children: [
+                            Expanded(
+                              child: SecondaryButton(
+                                label: 'Capture Image',
+                                icon: Icons.camera_alt_outlined,
+                                onPressed: _onCapturePressed,
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(
+                              child: SecondaryButton(
+                                label: 'Upload Image',
+                                icon: Icons.photo_library_outlined,
+                                onPressed: _onUploadPressed,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ] else ...[
+                        Row(
+                          children: [
+                            Expanded(
+                              child: SecondaryButton(
+                                label: 'Capture Again',
+                                icon: Icons.camera_alt_outlined,
+                                onPressed: _onCapturePressed,
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(
+                              child: SecondaryButton(
+                                label: 'Choose Another',
+                                icon: Icons.photo_library_outlined,
+                                onPressed: _onUploadPressed,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Center(
+                          child: TextButton.icon(
+                            key: const Key('remove_image_button'),
+                            onPressed: _onRemovePressed,
+                            icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
+                            label: const Text(
+                              'REMOVE IMAGE',
+                              style: TextStyle(
+                                color: Colors.redAccent,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: AppSpacing.xl),
+                      // 4. START SCAN button
                       Container(
                         height: 60,
                         decoration: BoxDecoration(
@@ -142,7 +299,19 @@ class ScannerScreen extends StatelessWidget {
                             ),
                           ),
                           onPressed: () {
-                            Navigator.pushNamed(context, '/result');
+                            if (_imagePath == null && !ScannerScreen.bypassValidation) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Please capture or upload an image first.'),
+                                ),
+                              );
+                            } else {
+                              Navigator.pushNamed(
+                                context,
+                                '/result',
+                                arguments: _imagePath,
+                              );
+                            }
                           },
                           child: const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -163,7 +332,7 @@ class ScannerScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: AppSpacing.xl),
-                      // 4. Bottom buttons
+                      // 5. Bottom navigation grid
                       Row(
                         children: [
                           Expanded(
@@ -356,5 +525,3 @@ class ScannerIconPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
-
-

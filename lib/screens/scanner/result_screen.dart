@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
@@ -9,10 +10,13 @@ import '../../widgets/app_section_header.dart';
 import '../../widgets/secondary_button.dart';
 
 class ResultScreen extends StatelessWidget {
-  const ResultScreen({super.key});
+  const ResultScreen({super.key, this.imagePath});
+
+  final String? imagePath;
 
   @override
   Widget build(BuildContext context) {
+    final effectiveImagePath = imagePath ?? (ModalRoute.of(context)?.settings.arguments as String?);
     return AppScaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -63,6 +67,37 @@ class ResultScreen extends StatelessWidget {
                     subtitle: 'MobileNetV3 Neural Classification',
                   ),
                   const SizedBox(height: AppSpacing.lg),
+                  if (effectiveImagePath != null) ...[
+                    Container(
+                      height: 200,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(
+                          color: AppColors.border,
+                          width: 1.2,
+                        ),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(22),
+                        child: Image.file(
+                          File(effectiveImagePath),
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Center(
+                              child: Icon(
+                                Icons.image_not_supported_rounded,
+                                color: AppColors.textSecondary,
+                                size: 48,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                  ],
                   // 1. Substance Result Card (with Red Border & Risk Badge)
                   Container(
                     decoration: BoxDecoration(
@@ -105,7 +140,7 @@ class ResultScreen extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Heroin Detected',
+                                    'Unknown',
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleLarge
@@ -133,7 +168,7 @@ class ResultScreen extends StatelessWidget {
                                           ),
                                         ),
                                         child: Text(
-                                          'HIGH RISK',
+                                          'Pending Analysis',
                                           style: Theme.of(context)
                                               .textTheme
                                               .labelSmall
@@ -172,7 +207,7 @@ class ResultScreen extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 12),
                                   _ConfidenceBar(
-                                    percent: 0.947,
+                                    percent: 0.0,
                                     gradient: const LinearGradient(
                                       colors: [
                                         AppColors.warning,
@@ -185,7 +220,7 @@ class ResultScreen extends StatelessWidget {
                             ),
                             const SizedBox(width: AppSpacing.md),
                             Text(
-                              '94.7%',
+                              '0%',
                               style: Theme.of(context)
                                   .textTheme
                                   .headlineSmall
@@ -282,7 +317,7 @@ class ResultScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: AppSpacing.md),
                           Text(
-                            'This substance is prohibited under Sri Lankan law; possession, trafficking, or manufacture may result in imprisonment.',
+                            'Awaiting AI Classification',
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium

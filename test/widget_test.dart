@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:narcolib_app/app.dart';
 import 'package:narcolib_app/screens/report/pdf_report_screen.dart';
+import 'package:narcolib_app/screens/scanner/scanner_screen.dart';
 
 void main() {
   testWidgets('NarcoLib home screen renders', (WidgetTester tester) async {
@@ -100,16 +101,20 @@ void main() {
     await tester.tap(find.text('New Scan'));
     await tester.pumpAndSettle();
 
+    ScannerScreen.bypassValidation = true;
+
     // 2. Tap START SCAN on Scanner Screen to navigate to Result Screen
     await tester.tap(find.text('START SCAN'));
     await tester.pumpAndSettle();
+    
+    ScannerScreen.bypassValidation = false;
 
     // 3. Verify details on the Result Screen
     expect(find.text('ANALYSIS COMPLETE'), findsOneWidget);
-    expect(find.text('Heroin Detected'), findsOneWidget);
-    expect(find.text('HIGH RISK'), findsOneWidget);
+    expect(find.text('Unknown'), findsOneWidget);
+    expect(find.text('Pending Analysis'), findsOneWidget);
     expect(find.text('AI CONFIDENCE'), findsOneWidget);
-    expect(find.text('94.7%'), findsOneWidget);
+    expect(find.text('0%'), findsOneWidget);
     expect(find.text('Legal Classification'), findsOneWidget);
 
     // Scroll to reveal and verify remaining panels step-by-step
@@ -221,7 +226,7 @@ void main() {
 
     // Verify we navigated to the Result Screen
     expect(find.text('ANALYSIS COMPLETE'), findsOneWidget);
-    expect(find.text('Heroin Detected'), findsOneWidget);
+    expect(find.text('Unknown'), findsOneWidget);
   });
 
   testWidgets('gallery screen renders correctly and displays evidence cards', (WidgetTester tester) async {
@@ -424,6 +429,63 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('This software is designated for authorized law enforcement personnel only.'), findsOneWidget);
+  });
+
+  testWidgets('scanner screen displays capture and upload options when no image is selected', (WidgetTester tester) async {
+    await tester.pumpWidget(const NarcoLibApp());
+
+    // Navigate to Scanner Screen
+    await tester.tap(find.text('OFFICER LOGIN'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Secure Login'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Secure Login'));
+    await tester.pumpAndSettle();
+
+    final listFinder = find.byType(ListView);
+    await tester.drag(listFinder, const Offset(0, -400));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('New Scan'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('New Scan'));
+    await tester.pumpAndSettle();
+
+    // Verify Capture Image and Upload Image buttons are present
+    expect(find.text('Capture Image'), findsOneWidget);
+    expect(find.text('Upload Image'), findsOneWidget);
+    expect(find.text('Capture Again'), findsNothing);
+    expect(find.text('Choose Another'), findsNothing);
+    expect(find.text('REMOVE IMAGE'), findsNothing);
+  });
+
+  testWidgets('scanner screen shows snackbar when tapping start scan with no image selected', (WidgetTester tester) async {
+    await tester.pumpWidget(const NarcoLibApp());
+
+    // Navigate to Scanner Screen
+    await tester.tap(find.text('OFFICER LOGIN'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Secure Login'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Secure Login'));
+    await tester.pumpAndSettle();
+
+    final listFinder = find.byType(ListView);
+    await tester.drag(listFinder, const Offset(0, -400));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('New Scan'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('New Scan'));
+    await tester.pumpAndSettle();
+
+    // Verify initial state
+    expect(find.text('Capture Image'), findsOneWidget);
+
+    // Tap START SCAN
+    await tester.tap(find.text('START SCAN'));
+    await tester.pump(); // Pump frame to trigger SnackBar
+
+    // Verify SnackBar message is shown
+    expect(find.text('Please capture or upload an image first.'), findsOneWidget);
   });
 }
 
