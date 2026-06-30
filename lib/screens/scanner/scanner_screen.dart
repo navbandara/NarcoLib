@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_spacing.dart';
-import '../../core/routes/app_routes.dart';
 import '../../widgets/app_scaffold.dart';
 import '../../widgets/bottom_navigation_card.dart';
 import '../../widgets/secondary_button.dart';
@@ -24,6 +23,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
   final ImagePickerService _pickerService = ImagePickerService();
   String? _imagePath;
   String? _placeholderMessage;
+  bool _isAnalyzing = false;
 
   Future<void> _onCapturePressed() async {
     final path = await _pickerService.captureImage();
@@ -38,9 +38,11 @@ class _ScannerScreenState extends State<ScannerScreen> {
           _placeholderMessage = 'Selection cancelled.';
         });
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Image selection cancelled.')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Image selection cancelled.')),
+        );
+      }
     }
   }
 
@@ -57,9 +59,11 @@ class _ScannerScreenState extends State<ScannerScreen> {
           _placeholderMessage = 'Selection cancelled.';
         });
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Image selection cancelled.')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Image selection cancelled.')),
+        );
+      }
     }
   }
 
@@ -104,277 +108,310 @@ class _ScannerScreenState extends State<ScannerScreen> {
           ),
         ),
       ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 390),
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.lg,
-                    vertical: AppSpacing.md,
+      child: _isAnalyzing
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(
+                    color: AppColors.primary,
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const SizedBox(height: AppSpacing.xs),
-                      // 1. Instruction label
-                      Center(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.surface.withOpacity(0.4),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: AppColors.primary.withOpacity(0.3),
-                              width: 1,
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.info_outline_rounded,
-                                color: AppColors.primary,
-                                size: 18,
-                              ),
-                              const SizedBox(width: 10),
-                              Flexible(
-                                child: Text(
-                                  'Capture the substance',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium
-                                      ?.copyWith(
-                                        color: AppColors.primary,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0.3,
-                                      ),
-                                ),
-                              ),
-                            ],
-                          ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Text(
+                    'Analyzing Image...',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.0,
                         ),
-                      ),
-                      const SizedBox(height: AppSpacing.xxl),
-                      // 2. Scanner targeting/reticle design
-                      Center(
-                        child: Container(
-                          width: 280,
-                          height: 280,
-                          decoration: BoxDecoration(
-                            color: AppColors.surface.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: AppColors.border.withOpacity(0.4),
-                              width: 1.2,
-                            ),
-                          ),
-                          child: Stack(
-                            children: [
-                              // Selected image preview or placeholder text
-                              Positioned.fill(
-                                child: _imagePath != null
-                                    ? ClipRRect(
-                                        borderRadius: BorderRadius.circular(16),
-                                        child: Image.file(
-                                          File(_imagePath!),
-                                          fit: BoxFit.cover,
-                                        ),
-                                      )
-                                    : Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(AppSpacing.md),
-                                          child: Text(
-                                            _placeholderMessage ?? 'Ready to scan.\nUse the controls below to select an image.',
-                                            textAlign: TextAlign.center,
-                                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                  color: AppColors.textSecondary,
-                                                ),
-                                          ),
-                                        ),
-                                      ),
-                              ),
-                              // Reticle overlay paint
-                              const Positioned.fill(
-                                child: CustomPaint(
-                                  painter: ScannerReticlePainter(),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      // 3. Image Actions controls
-                      if (_imagePath == null) ...[
-                        Row(
-                          children: [
-                            Expanded(
-                              child: SecondaryButton(
-                                label: 'Capture Image',
-                                icon: Icons.camera_alt_outlined,
-                                onPressed: _onCapturePressed,
-                              ),
-                            ),
-                            const SizedBox(width: AppSpacing.md),
-                            Expanded(
-                              child: SecondaryButton(
-                                label: 'Upload Image',
-                                icon: Icons.photo_library_outlined,
-                                onPressed: _onUploadPressed,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ] else ...[
-                        Row(
-                          children: [
-                            Expanded(
-                              child: SecondaryButton(
-                                label: 'Capture Again',
-                                icon: Icons.camera_alt_outlined,
-                                onPressed: _onCapturePressed,
-                              ),
-                            ),
-                            const SizedBox(width: AppSpacing.md),
-                            Expanded(
-                              child: SecondaryButton(
-                                label: 'Choose Another',
-                                icon: Icons.photo_library_outlined,
-                                onPressed: _onUploadPressed,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        Center(
-                          child: TextButton.icon(
-                            key: const Key('remove_image_button'),
-                            onPressed: _onRemovePressed,
-                            icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
-                            label: const Text(
-                              'REMOVE IMAGE',
-                              style: TextStyle(
-                                color: Colors.redAccent,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                      const SizedBox(height: AppSpacing.xl),
-                      // 4. START SCAN button
-                      Container(
-                        height: 60,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          gradient: const LinearGradient(
-                            colors: [
-                              AppColors.primary,
-                              Color(0xFF0DADB5),
-                            ],
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.primary.withOpacity(0.35),
-                              blurRadius: 18,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                          onPressed: () {
-                            if (_imagePath == null && !ScannerScreen.bypassValidation) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Please capture or upload an image first.'),
-                                ),
-                              );
-                            } else {
-                              Navigator.pushNamed(
-                                context,
-                                '/result',
-                                arguments: _imagePath,
-                              );
-                            }
-                          },
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ScannerIcon(),
-                              SizedBox(width: 12),
-                              Text(
-                                'START SCAN',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: 0.8,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.xl),
-                      // 5. Bottom navigation grid
-                      Row(
-                        children: [
-                          Expanded(
-                            child: BottomNavigationCard(
-                              label: 'GEO MAP',
-                              icon: Icons.map_outlined,
-                              onPressed: () {
-                                Navigator.pushNamed(context, '/location');
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Expanded(
-                            child: BottomNavigationCard(
-                              label: 'HISTORY',
-                              icon: Icons.history_rounded,
-                              onPressed: () {
-                                Navigator.pushNamed(context, '/history');
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Expanded(
-                            child: BottomNavigationCard(
-                              label: 'GALLERY',
-                              icon: Icons.photo_camera_outlined,
-                              onPressed: () {
-                                Navigator.pushNamed(context, '/gallery');
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.xs),
-                    ],
                   ),
-                ),
+                ],
               ),
+            )
+          : LayoutBuilder(
+              builder: (context, constraints) {
+                return Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 390),
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.lg,
+                          vertical: AppSpacing.md,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const SizedBox(height: AppSpacing.xs),
+                            // 1. Instruction label
+                            Center(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.surface.withValues(alpha: 0.4),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: AppColors.primary.withValues(alpha: 0.3),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.info_outline_rounded,
+                                      color: AppColors.primary,
+                                      size: 18,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Flexible(
+                                      child: Text(
+                                        'Capture the substance',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium
+                                            ?.copyWith(
+                                              color: AppColors.primary,
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: 0.3,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.xxl),
+                            // 2. Scanner targeting/reticle design
+                            Center(
+                              child: Container(
+                                width: 280,
+                                height: 280,
+                                decoration: BoxDecoration(
+                                  color: AppColors.surface.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: AppColors.border.withValues(alpha: 0.4),
+                                    width: 1.2,
+                                  ),
+                                ),
+                                child: Stack(
+                                  children: [
+                                    // Selected image preview or placeholder text
+                                    Positioned.fill(
+                                      child: _imagePath != null
+                                          ? ClipRRect(
+                                              borderRadius: BorderRadius.circular(16),
+                                              child: Image.file(
+                                                File(_imagePath!),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            )
+                                          : Center(
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(AppSpacing.md),
+                                                child: Text(
+                                                  _placeholderMessage ?? 'Ready to scan.\nUse the controls below to select an image.',
+                                                  textAlign: TextAlign.center,
+                                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                                        color: AppColors.textSecondary,
+                                                      ),
+                                                ),
+                                              ),
+                                            ),
+                                    ),
+                                    // Reticle overlay paint
+                                    const Positioned.fill(
+                                      child: CustomPaint(
+                                        painter: ScannerReticlePainter(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.lg),
+                            // 3. Image Actions controls
+                            if (_imagePath == null) ...[
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: SecondaryButton(
+                                      label: 'Capture Image',
+                                      icon: Icons.camera_alt_outlined,
+                                      onPressed: _onCapturePressed,
+                                    ),
+                                  ),
+                                  const SizedBox(width: AppSpacing.md),
+                                  Expanded(
+                                    child: SecondaryButton(
+                                      label: 'Upload Image',
+                                      icon: Icons.photo_library_outlined,
+                                      onPressed: _onUploadPressed,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ] else ...[
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: SecondaryButton(
+                                      label: 'Capture Again',
+                                      icon: Icons.camera_alt_outlined,
+                                      onPressed: _onCapturePressed,
+                                    ),
+                                  ),
+                                  const SizedBox(width: AppSpacing.md),
+                                  Expanded(
+                                    child: SecondaryButton(
+                                      label: 'Choose Another',
+                                      icon: Icons.photo_library_outlined,
+                                      onPressed: _onUploadPressed,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              Center(
+                                child: TextButton.icon(
+                                  key: const Key('remove_image_button'),
+                                  onPressed: _onRemovePressed,
+                                  icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
+                                  label: const Text(
+                                    'REMOVE IMAGE',
+                                    style: TextStyle(
+                                      color: Colors.redAccent,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                            const SizedBox(height: AppSpacing.xl),
+                            // 4. ANALYZE button
+                            Container(
+                              height: 60,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    AppColors.primary,
+                                    Color(0xFF0DADB5),
+                                  ],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppColors.primary.withValues(alpha: 0.35),
+                                    blurRadius: 18,
+                                    offset: const Offset(0, 6),
+                                  ),
+                                ],
+                              ),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                 onPressed: () async {
+                                  if (_imagePath == null && !ScannerScreen.bypassValidation) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Please capture or upload an image first.'),
+                                      ),
+                                    );
+                                  } else {
+                                    setState(() {
+                                      _isAnalyzing = true;
+                                    });
+
+                                    final navigator = Navigator.of(context);
+
+                                    // Mock 2-second analysis delay
+                                    await Future<void>.delayed(const Duration(seconds: 2));
+
+                                    if (mounted) {
+                                      setState(() {
+                                        _isAnalyzing = false;
+                                      });
+                                      navigator.pushNamed(
+                                        '/result',
+                                        arguments: _imagePath,
+                                      );
+                                    }
+                                  }
+                                },
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    ScannerIcon(),
+                                    SizedBox(width: 12),
+                                    Text(
+                                      'ANALYZE',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 0.8,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.xl),
+                            // 5. Bottom navigation grid
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: BottomNavigationCard(
+                                    label: 'GEO MAP',
+                                    icon: Icons.map_outlined,
+                                    onPressed: () {
+                                      Navigator.pushNamed(context, '/location');
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: AppSpacing.sm),
+                                Expanded(
+                                  child: BottomNavigationCard(
+                                    label: 'HISTORY',
+                                    icon: Icons.history_rounded,
+                                    onPressed: () {
+                                      Navigator.pushNamed(context, '/history');
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: AppSpacing.sm),
+                                Expanded(
+                                  child: BottomNavigationCard(
+                                    label: 'GALLERY',
+                                    icon: Icons.photo_camera_outlined,
+                                    onPressed: () {
+                                      Navigator.pushNamed(context, '/gallery');
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: AppSpacing.xs),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
-          );
-        },
-      ),
     );
   }
 }
@@ -394,15 +431,15 @@ class ScannerReticlePainter extends CustomPainter {
 
     // 1. Concentric Circles
     // Outer circle
-    canvas.drawCircle(center, 120, paintCyan..color = AppColors.primary.withOpacity(0.25));
+    canvas.drawCircle(center, 120, paintCyan..color = AppColors.primary.withValues(alpha: 0.25));
     // Middle circle
-    canvas.drawCircle(center, 90, paintCyan..color = AppColors.primary.withOpacity(0.45));
+    canvas.drawCircle(center, 90, paintCyan..color = AppColors.primary.withValues(alpha: 0.45));
     // Inner circle
-    canvas.drawCircle(center, 60, paintCyan..color = AppColors.primary.withOpacity(0.7));
+    canvas.drawCircle(center, 60, paintCyan..color = AppColors.primary.withValues(alpha: 0.7));
 
     // 2. Crosshairs
     final paintCrosshair = Paint()
-      ..color = AppColors.primary.withOpacity(0.55)
+      ..color = AppColors.primary.withValues(alpha: 0.55)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
 
@@ -458,12 +495,12 @@ class ScannerReticlePainter extends CustomPainter {
     canvas.drawLine(Offset(width - padding, height - padding), Offset(width - padding - bracketLen, height - padding), bracketPaint);
     canvas.drawLine(Offset(width - padding, height - padding), Offset(width - padding, height - padding - bracketLen), bracketPaint);
 
-    // 5. Center Dot and Glow
+    // 5. Center Glow and Dot
     final glowPaint = Paint()
       ..shader = RadialGradient(
         colors: [
-          AppColors.primary.withOpacity(0.8),
-          AppColors.primary.withOpacity(0.0),
+          AppColors.primary.withValues(alpha: 0.8),
+          AppColors.primary.withValues(alpha: 0.0),
         ],
       ).createShader(Rect.fromCircle(center: center, radius: 24));
     canvas.drawCircle(center, 24, glowPaint);

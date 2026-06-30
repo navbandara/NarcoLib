@@ -1,28 +1,38 @@
 import 'dart:async';
-import '../models/scan_result_model.dart';
+import '../ai/ai_manager.dart';
+import '../ai/prediction_result.dart';
 
-/// Service to manage local MobileNetV3 TFlite model operations and classifications.
+/// Service class responsible for exposing high-level AI model workflows.
+///
+/// Under the hood, this service coordinates calls to the [AiManager] to initialize models,
+/// run predictions on local image paths, and dispose of runtime interpreter contexts.
 class AiService {
+  final AiManager _aiManager;
+
+  /// Constructs an [AiService] with an optional injected [AiManager].
+  AiService({AiManager? aiManager}) : _aiManager = aiManager ?? AiManager();
+
   /// Loads the TFlite model binary assets and label definitions.
+  ///
+  /// This initializes the underlying inference engine and prepares it for prediction tasks.
   Future<void> loadModel() async {
-    // TODO: Integrate tflite_flutter package to initialize runtime interpreter and load models.
+    // Under clean architecture, delegate to AiManager coordinator
+    await _aiManager.initialize();
   }
 
-  /// Classifies a target raw sample image file.
-  /// Returns a completed [ScanResultModel] object describing substance category, confidence, and metadata.
-  Future<ScanResultModel> classifySubstance(String imagePath, double latitude, double longitude) async {
-    // TODO: Run interpreter inference on image bytes, lookup labels, extract primary/alternative matches, and output scan result.
-    return ScanResultModel(
-      id: 'mock-scan-id',
-      officerId: 'mock-officer-id',
-      timestamp: DateTime.now(),
-      predictedSubstance: 'Heroin (Diacetylmorphine)',
-      confidence: 94.7,
-      riskLevel: 'HIGH RISK',
-      legalReference: 'Poisons, Opium, and Dangerous Drugs Ordinance, Section 54',
-      latitude: latitude,
-      longitude: longitude,
-      address: 'Colombo, Sri Lanka',
-    );
+  /// Classifies a target image file and yields a detailed [PredictionResult].
+  ///
+  /// Uses the active model interpreter to run classification on the given [imagePath].
+  /// Returns mock/real prediction results depending on the active implementation stage.
+  Future<PredictionResult> classifyImage(String imagePath) async {
+    // Under clean architecture, delegate inference and parsing to AiManager
+    return await _aiManager.predict(imagePath);
+  }
+
+  /// Disposes of the loaded model interpreter and frees up allocated resources.
+  ///
+  /// Call this when the AI classification features are no longer active to prevent memory leaks.
+  Future<void> disposeModel() async {
+    await _aiManager.dispose();
   }
 }
