@@ -43,3 +43,9 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Machine learning datasets and large reports
+machine_learning/data_split/
+machine_learning/reports/split_file_manifest.csv
+machine_learning/reports/skipped_split_files.csv
+
